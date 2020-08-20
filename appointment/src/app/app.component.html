@@ -1,0 +1,78 @@
+<app-full-loading-modal *ngIf="isProcessing"></app-full-loading-modal>
+
+<mat-drawer-container class="container" autosize>
+  <mat-drawer #drawer mode="side" [opened]="isLoggedIn">
+    <div class="sidebar-background-overlay"></div>
+    <div class="actual-content">
+      <div class="logo-container">
+        <div class="logo"><img src="../assets/logo.png"></div>
+        <div class="logo-text">APPOINTMENT</div>
+      </div>
+
+      <div class="side-drawer-links-container">
+        <a mat-button routerLink="/appointment/dashboard" routerLinkActive="active-nav-link"
+          [routerLinkActiveOptions]="{exact: true}">
+          <mat-icon>dashboard</mat-icon>Dashboard
+        </a>
+        <a mat-button routerLink="/appointment/my-created-appointments" routerLinkActive="active-nav-link"
+          [routerLinkActiveOptions]="{exact: true}">
+          <mat-icon>ballot</mat-icon>Created Appointments
+        </a>
+        <a *ngIf="isDoctor || isSystemAdmin" mat-button routerLink="/appointment/my-reviews"
+          routerLinkActive="active-nav-link" [routerLinkActiveOptions]="{exact: true}">
+          <mat-icon>healing</mat-icon>
+          <span *ngIf="myClinic">{{myClinic}} </span>Reviews
+        </a>
+        <a *ngIf="isDoctor || isSystemAdmin" mat-button routerLink="/appointment/my-referrals"
+          routerLinkActive="active-nav-link" [routerLinkActiveOptions]="{exact: true}">
+          <mat-icon>replay</mat-icon>
+          <span *ngIf="myClinic">{{myClinic}} </span>Referrals
+        </a>
+        <a *ngIf="isEditor || isSystemAdmin" mat-button routerLink="/appointment/doctor-reviews"
+          routerLinkActive="active-nav-link" [routerLinkActiveOptions]="{exact: true}">
+          <mat-icon>library_books</mat-icon>Bookings
+        </a>
+      </div>
+    </div>
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <!-- Show on all other pages -->
+    <mat-toolbar *ngIf="isLoggedIn" class="mat-elevation-z2">
+      <mat-toolbar-row>
+        <button mat-icon-button (click)="drawer.toggle()" *ngIf="isLoggedIn">
+          <mat-icon>menu</mat-icon>
+        </button>
+
+        <span>{{ currentPageTitle }}</span>
+        <span class="spacer"></span>
+
+
+        <button mat-button [matMenuTriggerFor]="logoutMenu" class="username">
+          <mat-icon>person</mat-icon>
+          <span>{{ username }}</span>
+          <mat-icon style="margin-right: 0;">arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #logoutMenu="matMenu">
+          <button mat-menu-item (click)="onChangePassword()">
+            <mat-icon>edit</mat-icon>
+            <span>Change Password</span>
+          </button>
+          <button mat-menu-item (click)="onLogout(drawer)">
+            <mat-icon>exit_to_app</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+
+        <button mat-icon-button routerLink="/settings" *ngIf="isSystemAdmin">
+          <mat-icon>settings</mat-icon>
+        </button>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <div id="main-content">
+      <div class="page-content-container">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>

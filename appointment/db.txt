@@ -1,0 +1,7 @@
+CREATE TABLE `appointment`.`reviews` ( `id` INT UNSIGNED NOT NULL , `patient_name` VARCHAR(200) NOT NULL , `clinic` TINYINT(3) NOT NULL , `made_by` INT(4) NOT NULL , `booked_date` VARCHAR(20) NOT NULL , `booked_time` VARCHAR(10) NOT NULL , `insurance` SMALLINT(4) NOT NULL , `phone_number` VARCHAR(20) NOT NULL , `response` VARCHAR(20) NOT NULL , `remarks` TEXT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+CREATE TABLE `appointment`.`referrals` ( `id` INT UNSIGNED NOT NULL , `patient_name` VARCHAR(200) NOT NULL , `clinic` SMALLINT(3) NOT NULL , `made_by` INT(4) NOT NULL , `booked_date` VARCHAR(20) NOT NULL , `booked_time` VARCHAR(10) NOT NULL , `insurance` SMALLINT(4) NOT NULL , `phone_number` VARCHAR(20) NOT NULL , `response` VARCHAR(20) NOT NULL , `remarks` TEXT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+CREATE TABLE `appointment`.`clinics` ( `id` SMALLINT(3) NOT NULL AUTO_INCREMENT , `name` VARCHAR(100) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+CREATE TABLE `appointment`.`users` ( `id` INT UNSIGNED NOT NULL AUTO_INCREMENT , `username` VARCHAR(20) NOT NULL , `password` VARCHAR(20) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL , `fullname` VARCHAR(200) NOT NULL , `u_role` VARCHAR(10) NOT NULL , `active` TINYINT(1) DEFAULT 1, PRIMARY KEY (`id`)) ENGINE = InnoDB;

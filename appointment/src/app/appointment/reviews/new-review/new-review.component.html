@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>New Review</h2>
+  <mat-dialog-content>
+    <mat-form-field>
+      <input matInput [(ngModel)]="patientName" placeholder="Patient Name">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Clinic</mat-label>
+      <mat-select [(ngModel)]="clinic" [disabled]="userRole == 'doctor'">
+        <mat-option *ngFor="let clinic of clinics" [value]="clinic.name">{{ clinic.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput [matDatepicker]="dp3" placeholder="Date for Review" disabled [(ngModel)]="appointmentDate">
+      <mat-datepicker-toggle matSuffix [for]="dp3"></mat-datepicker-toggle>
+      <mat-datepicker #dp3 disabled="false"></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput [(ngModel)]="appointmentTime" [value]="appointmentTime" placeholder="Time for Appointment">
+      <button mat-icon-button matSuffix (click)="openTime()">
+        <mat-icon>av_timer</mat-icon>
+      </button>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <button mat-button mat-dialog-close="cancel">CANCEL</button>
+    <button mat-button color="primary"
+      [mat-dialog-close]="{patientName: patientName, clinic: clinic, appointmentDate: appointmentDate, appointmentTime: appointmentTime}" [disabled]="!patientName || !clinic || !appointmentDate">SAVE</button>
+  </mat-dialog-actions>

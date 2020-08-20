@@ -1,0 +1,76 @@
+.mat-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+}
+
+.login-container {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+  background-image: url(../../assets/ezra-jeffrey-comeau-EjZqnymtbZc-unsplash.jpg);
+  background-size: contain;
+  z-index: 1;
+  background-size: cover;
+}
+
+.overlay-container {
+  background-image: linear-gradient(rgba(94, 183, 231, .8), rgba(39, 88, 207, .9));
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  z-index: 2;
+}
+
+.topbar-with-color {
+  padding: 1.2rem 2rem;
+  position: relative;
+  z-index: 100;
+}
+
+.topbar-with-color h3 {
+  font-weight: 500;
+  font-size: 2rem;
+  color: white;
+  margin: 0;
+  text-align: center;
+  font-weight: 300;
+}
+
+.mat-card {
+  width: 400px;
+  min-height: 350px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 20px rgba(0, 0, 0, .4);
+  z-index: 200;
+}
+
+.mat-card p {
+  font-size: 3rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 300;
+  padding: 0;
+  margin: 0 0 2rem 0;
+}
+
+.login-icon-container {
+  width: 100%;
+  text-align: center;
+}
+
+.login-container .login-form .login-button-container {
+  text-align: right;
+}
+
+.expand-full-width {
+  width: 100%;
+}

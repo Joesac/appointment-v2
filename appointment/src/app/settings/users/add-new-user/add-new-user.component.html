@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>CREATE NEW USER</h2>
+<form #newUserForm="ngForm">
+  <mat-dialog-content>
+    <mat-form-field>
+      <input matInput [(ngModel)]="fullname" placeholder="Fullname" required ngModel name="fullname" minlength="6">
+      <mat-error>Fullname must be at least 6 characters</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput [(ngModel)]="username" placeholder="Username" required ngModel name="username" minlength="6">
+      <mat-error>Username must be at least 6 characters</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput [(ngModel)]="password" placeholder="Password" required ngModel name="password" minlength="6">
+      <mat-error>Password must be at least 6 characters</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Role</mat-label>
+      <mat-select [(ngModel)]="role" ngModel required name="role">
+        <mat-option *ngFor="let uRole of userRoles" [value]="uRole.value">
+          {{uRole.viewValue}}
+        </mat-option>
+      </mat-select>
+      <mat-error>Role cannot be empty</mat-error>
+    </mat-form-field>
+    <mat-form-field *ngIf="role === 'doctor'">
+      <mat-label>Clinic</mat-label>
+      <mat-select [(ngModel)]="clinic" ngModel name="clinic" required>
+        <mat-option *ngFor="let dClinic of clinics" [value]="dClinic.name">{{ dClinic.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button mat-dialog-close>CANCEL</button>
+    <button mat-button color="primary" [mat-dialog-close]="{fn: fullname, us: username, ps: password, role: role, clinic: clinic}" [disabled]="!newUserForm.valid">SAVE</button>
+  </mat-dialog-actions>
+</form>

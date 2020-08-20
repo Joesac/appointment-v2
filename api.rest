@@ -1,0 +1,17 @@
+GET http://localhost:3000/undoneReviews
+
+
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1NzI0Mzc3Mjd9.W1nJWIm_BpBc3i2iz_EEGerjX1KZbktg_gTgVSmNIKA
+
+###
+GET  http://localhost:3000/api/login?username=joesac&password=joesac
+
+###
+
+PATCH http://localhost:3000/completereview
+
+###
+GET http://localhost:3000/api/getclinics
+
+###
+GET http://localhost:3000/getallusers

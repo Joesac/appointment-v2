@@ -1,0 +1,8 @@
+<h2 mat-dialog-title>Cancel this Appointment?</h2>
+<mat-dialog-content>
+  <p>Are you sure you want to cancel this Appointment?</p>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close="no">No</button>
+  <button mat-button color="warn" [mat-dialog-close]="{appointmentId: appointmentId}">Yes</button>
+</mat-dialog-actions>

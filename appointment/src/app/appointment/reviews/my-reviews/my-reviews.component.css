@@ -1,0 +1,38 @@
+table {
+  width: 100%;
+}
+
+tr:hover td button {
+  visibility: visible;
+}
+
+td {
+  position: relative;
+}
+
+td button {
+  top: 0;
+  position: absolute;
+  visibility: hidden;
+}
+
+td button:nth-child(n+1) {
+  right: .5rem;
+}
+
+td button:nth-child(n+2) {
+  right: .5rem;
+}
+
+.start-date-field {
+  margin-right: 2rem;
+  margin-left: 2rem;
+}
+
+.end-date-field {
+  margin-right: 2rem;
+}
+
+.btn-done {
+  margin-bottom: 1rem;
+}

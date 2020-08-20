@@ -1,0 +1,38 @@
+<mat-progress-bar mode="indeterminate" *ngIf="processing" color="warn"></mat-progress-bar>
+<div class="login-container">
+  <div class="overlay-container"></div>
+  <div class="topbar-with-color">
+    <h3>APPOINTMENT</h3>
+  </div>
+  <mat-card>
+    <mat-card-title>
+      <div class="login-icon-container">
+        <p>Please sign in</p>
+      </div>
+    </mat-card-title>
+    <mat-card-content>
+      <form class="login-form" [formGroup]="form">
+        <mat-form-field class="expand-full-width">
+          <input type="text" matInput placeholder="Username" formControlName="username">
+          <mat-icon matSuffix>person</mat-icon>
+          <mat-error>
+            Username is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="expand-full-width">
+          <input type="password" matInput placeholder="Password" formControlName="password">
+          <mat-icon matSuffix>vpn_key</mat-icon>
+          <mat-error>
+            Password is required
+          </mat-error>
+        </mat-form-field>
+
+        <div class="login-button-container expand-full-width">
+          <button mat-raised-button color="primary" class="expand-full-width" (click)="onLogin()"
+            [disabled]="!form.valid">LOGIN</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

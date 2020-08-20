@@ -1,0 +1,48 @@
+.mat-card {
+  padding-left: .1rem;
+  padding-right: .1rem;
+  background: transparent;
+}
+
+table {
+  width: 100%;
+}
+
+tr:hover td button {
+  visibility: visible;
+}
+
+td {
+  position: relative;
+}
+
+td button {
+  top: 0;
+  position: absolute;
+  visibility: hidden;
+}
+
+td button {
+  right: 0;
+}
+
+.start-date-field,
+.end-date-field,
+.booked-on-date-field {
+  margin-right: 2rem;
+}
+
+.options {
+  width: 100%;
+  display: flex;
+}
+
+.booking-type-select {
+  flex-basis: 200px;
+  margin-right: 2rem;
+}
+
+.widgets {
+  display: flex;
+  align-items: center;
+}

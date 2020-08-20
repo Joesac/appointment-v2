@@ -1,0 +1,34 @@
+<!-- <div class="page-content-container"> -->
+  <!-- <h3>DASHBOARD</h3> -->
+  <div id="contentContainer">
+    <div class="spinner-container" *ngIf="isLoading">
+      <mat-spinner [strokeWidth]="5" [diameter]="60"></mat-spinner>
+    </div>
+
+    <div class="welcome-msg" *ngIf="loggedInAlready">Hi {{ firstname }}! What would you like to start with?</div>
+
+    <mat-grid-list cols="2" gutterSize="10" *ngIf="!isLoading">
+      <mat-grid-tile>
+        <button mat-raised-button color="primary" matTooltip="Add New Patient to be Reviewed"
+          (click)="openAddNewReviewDialog()">
+          <mat-icon>add</mat-icon>
+          <p>Add Review</p>
+        </button>
+      </mat-grid-tile>
+
+      <mat-grid-tile>
+        <button color="accent" mat-raised-button matTooltip="Refer a new Patient" (click)="openNewReferralDialog()">
+          <mat-icon>add</mat-icon>
+          <p>New Referrals</p>
+        </button>
+      </mat-grid-tile>
+
+      <!-- <mat-grid-tile *ngIf="isEditor || isSystemAdmin">
+        <button mat-raised-button matTooltip="Show all Patients to be Reviewed" routerLink="/appointment/doctor-reviews">
+          <mat-icon>group</mat-icon>
+          <p>View All</p>
+        </button>
+      </mat-grid-tile> -->
+    </mat-grid-list>
+  </div>
+<!-- </div> -->

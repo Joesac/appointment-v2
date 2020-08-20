@@ -1,0 +1,209 @@
+<!-- <h3>MY CREATED APPOINTMENTS</h3> -->
+<div class="my-reviews-options-container">
+  <mat-form-field class="booking-type-select">
+    <mat-label>Search Criteria</mat-label>
+    <mat-select [(ngModel)]="bookingDateOnFrom">
+      <mat-option value="booked_on">Booked on</mat-option>
+      <mat-option value="booked_for">Booked for</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div *ngIf="bookingDateOnFrom === 'booked_on'">
+    <mat-form-field class="start-date-field">
+      <input matInput [matDatepicker]="dp3" placeholder="Start Date" (dateChange)="onStartDateChange()" disabled
+        [(ngModel)]="dateFrom">
+      <mat-datepicker-toggle matSuffix [for]="dp3"></mat-datepicker-toggle>
+      <mat-datepicker #dp3 disabled="false"></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field class="end-date-field">
+      <input matInput [matDatepicker]="dp4" placeholder="End Date" disabled [(ngModel)]="dateTo">
+      <mat-datepicker-toggle matSuffix [for]="dp4"></mat-datepicker-toggle>
+      <mat-datepicker #dp4 disabled="false"></mat-datepicker>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" [disabled]="!onDateToAndFromSelected()"
+      (click)="onSearch(dateFrom, dateTo)">SEARCH</button>
+  </div>
+
+  <div *ngIf="bookingDateOnFrom === 'booked_for'">
+    <mat-form-field class="booked-on-date-field">
+      <input matInput [matDatepicker]="dp3" placeholder="Booked For" disabled [(ngModel)]="dateBookedFor">
+      <mat-datepicker-toggle matSuffix [for]="dp3"></mat-datepicker-toggle>
+      <mat-datepicker #dp3 disabled="false"></mat-datepicker>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="onSearch(dateBookedFor, null)">SEARCH</button>
+  </div>
+</div>
+
+<mat-tab-group (selectedTabChange)="changeAppointmentType($event)">
+  <mat-tab label="Reviews">
+    <mat-card>
+      <mat-card-content>
+        <div *ngIf="loadingMyCreatedReviews" style="display: flex; justify-content: center;">
+          <mat-spinner [strokeWidth]="4" [diameter]="40"></mat-spinner>
+        </div>
+
+        <div *ngIf="!loadingMyCreatedReviews" class="my-appointments-container">
+          <table mat-table [dataSource]="myCreatedReviewsDataSource" class="mat-elevation-z1">
+
+            <!-- Position Column -->
+            <!-- <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef><mat-checkbox (change)="$event ? masterToggle() : null"
+                [checked]="selection.hasValue() && isAllSelected(myCreatedReviewsDataSource)"
+                [indeterminate]="selection.hasValue() && !isAllSelected(myCreatedReviewsDataSource)"></mat-checkbox> </th>
+
+              <td mat-cell *matCellDef="let row"><mat-checkbox (click)="$event.stopPropagation()"
+                (change)="$event ? selection.toggle(row) : null"
+                [checked]="selection.isSelected(row)"></mat-checkbox></td>
+            </ng-container> -->
+
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef> Name </th>
+              <td mat-cell *matCellDef="let review"> {{review.name}} </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="insurance">
+              <th mat-header-cell *matHeaderCellDef> Insurance </th>
+              <td mat-cell *matCellDef="let review"> {{review.insurance}} </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="clinic">
+              <th mat-header-cell *matHeaderCellDef> Clinic </th>
+              <td mat-cell *matCellDef="let review"> {{review.clinic}} </td>
+            </ng-container>
+
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="time">
+              <th mat-header-cell *matHeaderCellDef> Time </th>
+              <td mat-cell *matCellDef="let review"> {{review.time}} </td>
+            </ng-container>
+
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="booked date">
+              <th mat-header-cell *matHeaderCellDef> Booked Date </th>
+              <td mat-cell *matCellDef="let review"> {{review.bookedDate | date}} </td>
+            </ng-container>
+
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="contact">
+              <th mat-header-cell *matHeaderCellDef> Contact </th>
+              <td mat-cell *matCellDef="let review"> {{review.contact}}
+                <button mat-icon-button matTooltip="Cancel Review" (click)="cancelAppointment(review)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Edit Review" (click)="editAppointment(review)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <!-- Symbol Column -->
+            <!-- <ng-container matColumnDef="response">
+              <th mat-header-cell *matHeaderCellDef> Response </th>
+              <td mat-cell *matCellDef="let review"> {{review.response}} </td>
+            </ng-container> -->
+
+            <!-- Symbol Column -->
+            <!-- <ng-container matColumnDef="remarks">
+              <th mat-header-cell *matHeaderCellDef> Remarks </th>
+              <td mat-cell *matCellDef="let review"> {{review.remarks}}
+                <button mat-icon-button matTooltip="Cancel Review" (click)="cancelAppointment(review)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Edit Review" (click)="editAppointment(review)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </td>
+            </ng-container> -->
+
+            <tr mat-header-row *matHeaderRowDef="reviewDisplayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: reviewDisplayedColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+
+  <mat-tab label="Referrals">
+    <ng-template matTabContent>
+      <mat-card>
+        <mat-card-content>
+          <div *ngIf="loadingMyCreatedReferrals" style="display: flex; justify-content: center;">
+            <mat-spinner [strokeWidth]="4" [diameter]="40"></mat-spinner>
+          </div>
+          <div *ngIf="!loadingMyCreatedReferrals" class="my-appointments-container">
+            <table mat-table [dataSource]="myCreatedReferralsDataSource" class="mat-elevation-z1">
+
+              <!-- Position Column -->
+              <!-- <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef><mat-checkbox (change)="$event ? masterToggle() : null"
+                  [checked]="selection.hasValue() && isAllSelected(myCreatedReferralsDataSource)"
+                  [indeterminate]="selection.hasValue() && !isAllSelected(myCreatedReferralsDataSource)"></mat-checkbox> </th>
+
+                <td mat-cell *matCellDef="let row"><mat-checkbox (click)="$event.stopPropagation()"
+                  (change)="$event ? selection.toggle(row) : null"
+                  [checked]="selection.isSelected(row)"></mat-checkbox></td>
+              </ng-container> -->
+
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> Name </th>
+                <td mat-cell *matCellDef="let referral"> {{referral.name}} </td>
+              </ng-container>
+
+              <!-- Name Column -->
+              <ng-container matColumnDef="insurance">
+                <th mat-header-cell *matHeaderCellDef> Insurance </th>
+                <td mat-cell *matCellDef="let referral"> {{referral.insurance}} </td>
+              </ng-container>
+
+              <!-- Weight Column -->
+              <ng-container matColumnDef="clinic">
+                <th mat-header-cell *matHeaderCellDef> Clinic </th>
+                <td mat-cell *matCellDef="let referral"> {{referral.clinic}} </td>
+              </ng-container>
+
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="time">
+                <th mat-header-cell *matHeaderCellDef> Time </th>
+                <td mat-cell *matCellDef="let referral"> {{referral.time}} </td>
+              </ng-container>
+
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="booked date">
+                <th mat-header-cell *matHeaderCellDef> Booked Date </th>
+                <td mat-cell *matCellDef="let referral"> {{referral.bookedDate | date}} </td>
+              </ng-container>
+
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="contact">
+                <th mat-header-cell *matHeaderCellDef> Contact </th>
+                <td mat-cell *matCellDef="let referral"> {{referral.contact}}</td>
+              </ng-container>
+
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="reason">
+                <th mat-header-cell *matHeaderCellDef> Reason </th>
+                <td mat-cell *matCellDef="let referral"> {{referral.reason}}
+                  <button mat-icon-button matTooltip="Cancel Referral" (click)="cancelAppointment(referral)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Edit Referral" (click)="editAppointment(referral)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="referralDisplayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: referralDisplayedColumns;"></tr>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </ng-template>
+
+  </mat-tab>
+</mat-tab-group>

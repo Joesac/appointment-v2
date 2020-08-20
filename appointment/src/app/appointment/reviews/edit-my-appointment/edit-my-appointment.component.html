@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>Edit Appointment</h2>
+<mat-dialog-content>
+  <mat-form-field>
+    <input matInput [(ngModel)]="patientName" placeholder="Patient Name" [value]="patientName">
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Clinic</mat-label>
+    <mat-select [(ngModel)]="clinic">
+      <mat-option *ngFor="let clinic of clinics" [value]="clinic.name">{{ clinic.name }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field *ngIf="appointmentType === 'referral'">
+    <textarea matInput [(ngModel)]="reason" placeholder="Reason for Referral" [value]="reason"></textarea>
+  </mat-form-field>
+
+  <mat-form-field class="normal-width" *ngIf="appointmentType == 'review' || role == 'editor' || role == 'system admin'">
+    <input matInput [matDatepicker]="dateForAppointment" [value]="appointmentDate" placeholder="Date for Appointment" disabled [(ngModel)]="appointmentDate">
+    <mat-datepicker-toggle matSuffix [for]="dateForAppointment"></mat-datepicker-toggle>
+    <mat-datepicker #dateForAppointment disabled="false"></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field class="normal-width" *ngIf="appointmentType == 'review' || role == 'editor' || role == 'system admin'">
+    <input matInput [(ngModel)]="appointmentTime" [value]="appointmentTime" placeholder="Time for Appointment">
+    <button mat-icon-button matSuffix (click)="openTime()">
+      <mat-icon>av_timer</mat-icon>
+    </button>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close="cancel">CANCEL</button>
+  <button mat-button color="primary"
+    [mat-dialog-close]="{_id: reviewId, patientName: patientName, clinic: clinic, insurance: insurance, appointmentDate: appointmentDate, appointmentTime: appointmentTime, contact: contact, remarks: remarks, response: response, reason: reason}">SAVE</button>
+</mat-dialog-actions>

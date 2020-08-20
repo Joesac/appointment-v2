@@ -1,0 +1,51 @@
+<h2 mat-dialog-title>Add other Details</h2>
+<mat-dialog-content>
+  <mat-form-field>
+    <input matInput [(ngModel)]="patientName" placeholder="Patient Name" [value]="patientName" readonly>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Clinic</mat-label>
+    <mat-select [(ngModel)]="clinic" readonly>
+      <mat-option *ngFor="let clinic of clinics" [value]="clinic.name">{{ clinic.name }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Insurance</mat-label>
+      <mat-select [(ngModel)]="insurance">
+        <mat-option *ngFor="let insurance of insurances" [value]="insurance.name">{{ insurance.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+  <mat-form-field class="normal-width">
+    <input matInput [matDatepicker]="dateForAppointment" [value]="appointmentDate" placeholder="Date for Appointment" disabled [(ngModel)]="appointmentDate">
+    <mat-datepicker-toggle matSuffix [for]="dateForAppointment"></mat-datepicker-toggle>
+    <mat-datepicker #dateForAppointment disabled="false"></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field class="normal-width">
+    <input matInput [(ngModel)]="appointmentTime" [value]="appointmentTime" placeholder="Time for Appointment">
+    <button mat-icon-button matSuffix (click)="openTime()">
+      <mat-icon>av_timer</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <mat-form-field class="contact-field">
+    <input matInput [(ngModel)]="contact" [value]="contact" type="tel" placeholder="Patient's Contact">
+  </mat-form-field>
+
+  <mat-form-field class="normal-width">
+    <input matInput [(ngModel)]="response" [value]="response" placeholder="Response">
+  </mat-form-field>
+
+  <mat-form-field class="normal-width">
+    <input matInput [(ngModel)]="remarks" [value]="remarks" placeholder="Remarks">
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close="cancel">CANCEL</button>
+  <button mat-button color="primary"
+    [mat-dialog-close]="{_id: reviewId, patientName: patientName, contact: contact, response: response, remarks: remarks, insurance: insurance, clinic: clinic, madeBy: madeBy, appointmentDate: appointmentDate, appointmentTime: appointmentTime, appointmentType: appointmentType}">SAVE</button>
+</mat-dialog-actions>

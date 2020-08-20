@@ -1,0 +1,20 @@
+#contentContainer {
+  max-width: 960px;
+  margin: auto;
+}
+
+#contentContainer .mat-raised-button {
+  width: 80%;
+  height: 65%;
+}
+
+#contentContainer .mat-raised-button .mat-icon {
+  font-size: 2rem;
+  text-align: center !important;
+  width: 100%;
+}
+
+.welcome-msg {
+  text-align: center;
+  font-size: 2rem;
+}

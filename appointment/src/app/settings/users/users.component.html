@@ -1,0 +1,52 @@
+<div class="all-users-options-container">
+  <button mat-raised-button color="primary" matTooltip="Add New User" (click)="openAddNewUserDialog()">NEW USER</button>
+</div>
+
+<div class="all-users-container">
+  <div class="spinner-container" *ngIf="isLoading">
+    <mat-spinner [strokeWidth]="5" [diameter]="60"></mat-spinner>
+  </div>
+
+  <mat-form-field>
+    <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+  </mat-form-field>
+
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
+    <!-- Position Column -->
+    <ng-container matColumnDef="fullname">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let user"> {{user.fullname}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="username">
+      <th mat-header-cell *matHeaderCellDef> Username </th>
+      <td mat-cell *matCellDef="let user"> {{user.username}} </td>
+    </ng-container>
+
+    <!-- Weight Column -->
+    <ng-container matColumnDef="password">
+      <th mat-header-cell *matHeaderCellDef> Password </th>
+      <td mat-cell *matCellDef="let user"> ****** </td>
+    </ng-container>
+
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="date-added">
+      <th mat-header-cell *matHeaderCellDef> Date Added </th>
+      <td mat-cell *matCellDef="let user"> {{user.dateAdded | date}} </td>
+    </ng-container>
+
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="role">
+      <th mat-header-cell *matHeaderCellDef> Role </th>
+      <td mat-cell *matCellDef="let user" class="edit-td"> {{user.role}} <span *ngIf="user.clinic">({{user.clinic}})</span>
+        <button mat-icon-button matTooltip="Edit User" (click)="onEditUser(user)">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="getClickedRow(row)"></tr>
+  </table>
+</div>

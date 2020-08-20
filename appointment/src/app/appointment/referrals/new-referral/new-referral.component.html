@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>New Referral</h2>
+<mat-dialog-content>
+  <mat-form-field>
+    <input matInput [(ngModel)]="patientName" placeholder="Patient Name">
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Clinic</mat-label>
+    <mat-select [(ngModel)]="clinic">
+      <mat-option *ngFor="let clinic of clinics" [value]="clinic.name">{{ clinic.name }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <textarea matInput placeholder="Reason for Referral" [(ngModel)]="referralReason"></textarea>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close="cancel">CANCEL</button>
+  <button mat-button color="primary" [mat-dialog-close]="{patientName: patientName, clinic: clinic, referralReason: referralReason}"
+    [disabled]="!patientName || !clinic">SAVE</button>
+</mat-dialog-actions>

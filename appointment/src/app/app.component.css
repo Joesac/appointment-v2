@@ -1,0 +1,115 @@
+.container {
+  position: absolute;
+  left: 0;
+  top: 0px;
+  right: 0;
+  bottom: 0;
+}
+
+.mat-toolbar {
+  z-index: 500;
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  color: rgba(0,0,0,.87);
+  background: #eee;
+}
+
+.container .mat-drawer {
+  width: 260px;
+  background-color: white;
+  box-shadow: 0 16px 38px -12px rgba(0,0,0,.56), 0 4px 25px 0 rgba(0,0,0,.12), 0 8px 10px -5px rgba(0,0,0,.2);
+  background-image: url("../assets/sidebar-bg.jpg");
+  background-size: cover;
+}
+
+.mat-drawer-side {
+  border: none;
+}
+
+.mat-drawer .sidebar-background-overlay {
+ position: absolute;
+ left: 0;
+ right: 0;
+ top: 0;
+ bottom: 0;
+ z-index: 5;
+ background: white;
+ opacity: .9;
+}
+
+.mat-drawer .actual-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+.mat-drawer .logo-container {
+  width: 100%;
+  display: flex;
+  margin-bottom: 1rem;
+  justify-content: center;
+  height: 64px;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+}
+
+.logo {
+  width: 30px;
+  height: 30px;
+}
+
+.logo img {
+  width: 100%;
+  height: 100%;
+}
+
+.logo-text {
+  padding-left: .5rem;
+  font-weight: 300;
+}
+
+.side-drawer-links-container {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.mat-drawer a {
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+  margin-bottom: .5rem;
+  font-size: 1rem;
+  font-weight: 300;
+}
+
+.mat-drawer a .mat-icon {
+  margin-left: .5rem;
+}
+
+.mat-drawer .mat-button {
+  width: 100%;
+  display: block;
+  text-align: left;
+  border-radius: 5px !important;
+}
+
+.mat-button .mat-icon {
+  margin-right: 1rem;
+}
+
+.mat-drawer-content {
+  background-color: #EEEEEE;
+}
+
+#main-content {
+  padding: 1.5rem;
+  /* border: 1px solid white; */
+}
+
+.active-nav-link {
+  background-color: #3F51B5;
+  color: white;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}

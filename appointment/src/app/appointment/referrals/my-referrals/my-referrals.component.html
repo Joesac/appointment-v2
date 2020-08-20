@@ -1,0 +1,101 @@
+<!-- <h3>MY REFERRALS</h3> -->
+<div class="spinner-container" *ngIf="isLoading">
+  <mat-spinner [strokeWidth]="5" [diameter]="60"></mat-spinner>
+</div>
+
+<div *ngIf="!isLoading">
+  <div class="my-referrals-options-container">
+      <!-- <button mat-mini-fab routerLink="/appointment/dashboard">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <mat-form-field class="start-date-field">
+        <input matInput [matDatepicker]="dp3" placeholder="Start Date" disabled>
+        <mat-datepicker-toggle matSuffix [for]="dp3"></mat-datepicker-toggle>
+        <mat-datepicker #dp3 disabled="false"></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field class="end-date-field">
+        <input matInput [matDatepicker]="dp4" placeholder="End Date" disabled>
+        <mat-datepicker-toggle matSuffix [for]="dp4"></mat-datepicker-toggle>
+        <mat-datepicker #dp4 disabled="false"></mat-datepicker>
+      </mat-form-field>
+
+      <button mat-button color="primary">SEARCH</button> -->
+      <button mat-raised-button color="accent" (click)="finishAppointment()" class="btn-done">DONE</button>
+  </div>
+  <div class="my-referrals-container">
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef><mat-checkbox (change)="$event ? masterToggle() : null"
+        [checked]="selection.hasValue() && isAllSelected()"
+        [indeterminate]="selection.hasValue() && !isAllSelected()"></mat-checkbox> </th>
+
+      <td mat-cell *matCellDef="let row"><mat-checkbox (click)="$event.stopPropagation()"
+        (change)="$event ? selection.toggle(row) : null"
+        [checked]="selection.isSelected(row)"></mat-checkbox></td>
+    </ng-container>
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let referral"> {{referral.name}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="insurance">
+      <th mat-header-cell *matHeaderCellDef> Insurance </th>
+      <td mat-cell *matCellDef="let referral"> {{referral.insurance}} </td>
+    </ng-container>
+
+    <!-- Weight Column -->
+    <ng-container matColumnDef="clinic">
+      <th mat-header-cell *matHeaderCellDef> Clinic </th>
+      <td mat-cell *matCellDef="let referral"> {{referral.clinic}} </td>
+    </ng-container>
+
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="time">
+      <th mat-header-cell *matHeaderCellDef> Time </th>
+      <td mat-cell *matCellDef="let referral"> {{referral.time}} </td>
+    </ng-container>
+
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="booked date">
+      <th mat-header-cell *matHeaderCellDef> Booked Date </th>
+      <td mat-cell *matCellDef="let referral"> {{referral.bookedDate | date}} </td>
+    </ng-container>
+
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="contact">
+      <th mat-header-cell *matHeaderCellDef> Contact </th>
+      <td mat-cell *matCellDef="let referral"> {{referral.contact}}
+          <button mat-icon-button matTooltip="Cancel Referral" (click)="cancelReferral(referral)">
+              <mat-icon>delete</mat-icon>
+            </button>
+      </td>
+    </ng-container>
+
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="reason">
+      <th mat-header-cell *matHeaderCellDef>Reason</th>
+      <td mat-cell *matCellDef="let referral"> {{referral.reason}} </td>
+    </ng-container>
+
+    <!-- Symbol Column -->
+    <!-- <ng-container matColumnDef="remarks">
+      <th mat-header-cell *matHeaderCellDef> Remarks </th>
+      <td mat-cell *matCellDef="let referral"> {{referral.remarks}}
+        <button mat-icon-button matTooltip="Cancel Referral" (click)="cancelReferral(referral)">
+          <mat-icon>delete</mat-icon>
+        </button> -->
+        <!-- <button mat-icon-button matTooltip="Edit Review" (click)="editReferral()">
+          <mat-icon>edit</mat-icon>
+        </button> -->
+      <!-- </td>
+    </ng-container> -->
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+  </div>
+</div>
