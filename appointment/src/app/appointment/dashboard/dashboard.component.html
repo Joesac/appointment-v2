@@ -6,6 +6,10 @@
     </div>
 
     <div class="welcome-msg" *ngIf="loggedInAlready">Hi {{ firstname }}! What would you like to start with?</div>
+    <!-- <div style="width: 100%; height: calc(100vh - 120px); flex-direction: column; display: flex; align-items: center; justify-content: center;">
+      <div class="welcome-msg">Hi {{ firstname }}! Please use the Consultation Software to book appointments</div>
+      <div class="sub">However, you can see the appointments already made on this system</div>
+    </div> -->
 
     <mat-grid-list cols="2" gutterSize="10" *ngIf="!isLoading">
       <mat-grid-tile>

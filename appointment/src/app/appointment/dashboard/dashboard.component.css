@@ -17,4 +17,11 @@
 .welcome-msg {
   text-align: center;
   font-size: 2rem;
+  /* color: rgb(192, 0, 0); */
+}
+
+.sub {
+  font-size: 1.5rem;
+  color: #00AB66;
+  display: block;
 }

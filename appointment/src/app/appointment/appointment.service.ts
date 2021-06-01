@@ -86,7 +86,7 @@ export class AppointmentService {
             formattedReferral.push(refIt);
           }
         }
-
+        console.log(formattedReview);
         this._undoneReviews.next(formattedReview);
         this._undoneReferrals.next(formattedReferral);
       })

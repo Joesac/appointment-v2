@@ -13,23 +13,12 @@ const mongoClient = require('mongodb').MongoClient;
 const url = `mongodb://${config.dbHost}:${config.port}`;
 const secreteKey = 'secreteKey';
 
-app.use(express.static(path.join(__dirname, '../appointment/dist/appointment-app')))
+app.use(express.static(path.join(__dirname, '../app')))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(cors())
-
-function checkAppActiveness(req, res, next) {
-  const stopageDate = new Date("07/02/2020");
-  const todayDate = new Date();
-  const differenceInTime = stopageDate.getTime() - todayDate.getTime();
-  const differenceInDays = differenceInTime / (1000 * 3600 * 24);
-
-  // if (differenceInDays > 0) next();
-  return differenceInDays;
-
-}
 
 function verifyToken(req, res, next) {
 
@@ -44,9 +33,9 @@ function verifyToken(req, res, next) {
   jwt.verify(token, secreteKey, (err, user) => {
     if (err) return res.sendStatus(403)
     req.user = user
-    if (config.caa() > 0) {
+    // if (config.caa() > 0) {
       next()
-    }
+    // }
   })
 }
 
@@ -114,6 +103,39 @@ function getInsurance(req, res, next) {
       client.close()
     })
   });
+}
+
+function checkIfDayIsEndOfDay(month, day) {
+  if (month == 9 || month == 4 || month == 6 ||month == 11) {
+    if (day > 30) {
+      return '30';
+    }
+  } else if(month == 2) {
+    if (day > 28) {
+      return '28';
+    }
+  } else {
+    if (day > 31) {
+      return '31';
+    }
+  }
+  return day;
+}
+
+function normalizeMonthAndDay(value) {
+  if (value.toString().length < 2) {
+    return `0${value}`
+  } else {
+    return value;
+  }
+}
+
+function normalizeTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = normalizeMonthAndDay(date.getMonth() + 1);
+  const day = normalizeMonthAndDay(date.getDate());
+  return new Date(`${year}-${month}-${day}T00:00:00.000Z`);
 }
 
 app.post('/api/editPassword', verifyToken, (req, res) => {
@@ -356,7 +378,8 @@ app.post('/api/insert-appointment', verifyToken, (req, res) => {
     }
     
     if (bookedDate != null) {
-      bookedDate = new Date(bookedDate)
+      // bookedDate = new Date(bookedDate)
+      bookedDate = normalizeTimestamp(bookedDate);
     }
 
     const payload = { name, clinic, bookedDate, time, madeBy, insurance, contact, response, remarks, done, editor, addedOn: new Date() };
@@ -443,13 +466,35 @@ app.get('/api/MyCreatedAppointments', verifyToken, (req, res) => {
   let dateTo = req.query.dateTo;
 
   if (dateTo == 'null') {
-    dateTo = new Date(dateFrom);
-    dateTo = new Date(dateTo.setDate(dateTo.getDate() - 1));
-
+    dateTo = dateFrom;
     dateCriteriaField = "$bookedDate";
   } else {
     dateCriteriaField = "$addedOn";
   }
+  
+  let dfM = (new Date(dateFrom).getMonth() + 1).toString();
+  let dtM = (new Date(dateTo).getMonth() + 1).toString();
+  let dfD = (new Date(dateFrom).getDate());
+  let dtD = (new Date(dateTo).getDate() + 1);
+
+
+  if (dfM.toString().length == 1) {
+    dfM = `0${dfM}`;
+  }
+  if (dtM.toString().length == 1) {
+    dtM = `0${dtM}`;
+  };
+
+  if (dfD.toString().length == 1) {
+    dfD = `0${dfD}`;
+  }
+  if (dtD.toString().length == 1) {
+    dtD = `0${dtD}`;
+  };
+  
+
+  let df = (`${new Date(dateFrom).getFullYear()}-${dfM}-${dfD}`);
+  let dt = (`${new Date(dateTo).getFullYear()}-${dtM}-${dtD}`);
   
   mongoClient.connect(url, {
   useNewUrlParser: true,
@@ -469,11 +514,6 @@ app.get('/api/MyCreatedAppointments', verifyToken, (req, res) => {
       return;
     }
     
-    let df = new Date(dateFrom);
-    
-    let dt = new Date(dateTo);
-    dt = new Date(dt.setDate(dt.getDate() + 1));
-    
     collection.aggregate([
       {
         $match: { "_id": ObjectId(id) },
@@ -486,7 +526,12 @@ app.get('/api/MyCreatedAppointments', verifyToken, (req, res) => {
           {
             from: fromCollection,
             let: { id: { $toString: "$_id" }, dateFrom: df, dateTo: dt },
-            pipeline: [{ $match: { $expr: {  $and: [ { $eq: [ "$madeBy", "$$id" ] }, { $gte: [ dateCriteriaField, "$$dateFrom" ] }, { $lte: [ dateCriteriaField, "$$dateTo"] } ] } } }],
+            pipeline: [
+              { 
+                // $match: { $expr: {  $and: [ { $eq: [ "$madeBy", "$$id" ] }, { $gte: [ dateCriteriaField, "$$dateFrom" ] }, { $lte: [ dateCriteriaField, "$$dateTo"] } ] } }
+                $match: { $expr: { $and: [ { $eq: [ "$madeBy", "$$id" ] }, { $eq: [ "$done", "0" ] }, { $gte: [ dateCriteriaField, new Date(df) ] }, { $lt: [ dateCriteriaField, new Date(dt) ] } ] } } 
+              }
+            ],
             as: `myAppointments`
           }
       }
@@ -610,7 +655,7 @@ app.get('/api/undone-appointments', verifyToken, (req, res) => {
     
     let dt = new Date(dateTo);
     dt = new Date(dt.setDate(dt.getDate() + 1));
-
+    
     collection.aggregate([
       {
         $project: {"_id": { $toString: "$_id"}, "fullname": 1}
@@ -672,7 +717,7 @@ app.patch('/api/completereview', verifyToken, (req, res) => {
     const collection = db.collection(config.dbCollectionReviews);
     for (const key in req.body) {
 
-      collection.updateOne({ _id: ObjectId(req.body[key]) }, {$set: { done: 1 } } )
+      collection.updateOne({ _id: ObjectId(req.body[key]) }, {$set: { done: "1" } } )
       .then(results => res.json(results))
       .catch(error => res.send(error));
     }
@@ -689,7 +734,7 @@ app.patch('/api/completereferral', verifyToken, (req, res) => {
     const collection = db.collection(config.dbCollectionReferrals);
     for (const key in req.body) {
 
-      collection.updateOne({ _id: ObjectId(req.body[key]) }, {$set: { done: 1 } } )
+      collection.updateOne({ _id: ObjectId(req.body[key]) }, {$set: { done: "1" } } )
       .then(results => res.json(results))
       .catch(error => res.send(error));
     }
@@ -713,9 +758,9 @@ app.patch('/api/completereferral', verifyToken, (req, res) => {
 })
 
 app.get('*', (req, res) => {
-  return res.sendFile(path.join(__dirname, '../appointment/dist/appointment-app/index.html'))
+  return res.sendFile(path.join(__dirname, '../app/index.html'))
 })
 
-app.listen(3000, () => {
-  console.log('Server started on port 3000...');
+app.listen(3200, () => {
+  console.log('Server started on port 3200...');
 })
