@@ -161,7 +161,7 @@ export class DoctorsNewReviewsComponent implements OnInit, OnDestroy {
           });
           return;
         }
-
+        
         this.appointmentService
           .updateAppointment(
             results._id,

@@ -14,11 +14,38 @@ interface ReturnedMyAppointment {
   myAppointments: Appointment[];
 }
 
-export interface AllReviewsResponseData {
-  fullname: string;
+export interface IAppointmentData {
+  addedOn: string;
+  bookedDate: string;
+  clinic: string;
+  contact: string;
+  creator: {
+    clinic: string | null;
+    dateAdded: string;
+    fullname: string;
+    password: string;
+    role: string;
+    username: string;
+    _id: string;
+  },
+  dateCriteriaField: string;
+  done: string;
+  editor: string;
+  insurance: null | string;
+  madeBy: string;
+  name: string;
+  remarks: ""
+  response: string;
+  time: null | string;
   _id: string;
-  reviews: Appointment[];
-  referrals: Appointment[];
+}
+
+export interface AppointmentsResponseData {
+  // fullname: string;
+  // _id: string;
+  // reviews: Appointment[];
+  // referrals: Appointment[];
+  data: { reviews: IAppointmentData[], referrals: IAppointmentData[] }
 }
 
 @Injectable({
@@ -29,8 +56,8 @@ export class AppointmentService {
   private _referrals = new BehaviorSubject<Appointment[]>([]);
   private _myCreatedReviews = new BehaviorSubject<Appointment[]>([]);
   private _myCreatedReferrals = new BehaviorSubject<Appointment[]>([]);
-  _undoneReviews = new BehaviorSubject<AllReviewsResponseData[]>([]);
-  _undoneReferrals = new BehaviorSubject<AllReviewsResponseData[]>([]);
+  _undoneReviews = new BehaviorSubject<IAppointmentData[]>([]);
+  _undoneReferrals = new BehaviorSubject<IAppointmentData[]>([]);
 
   constructor(
     private authService: AuthService,
@@ -68,27 +95,29 @@ export class AppointmentService {
       'Bearer ' + this.authService.getToken()
     );
 
-    return this.http.get<AllReviewsResponseData[]>(
+    return this.http.get<AppointmentsResponseData>(
       `/api/undone-appointments?dateFrom=${dateFrom}&dateTo=${dateTo}&searchValue=${searchValue}`,
       { headers }
     ).pipe(
       take(1),
-      tap(apptData => {
-        const formattedReview = [];
-        const formattedReferral = [];
-        for (const it of apptData) {
-          for (const revIt of it.reviews) {
-            revIt.madeBy = it.fullname;
-            formattedReview.push(revIt);
-          }
-          for (const refIt of it.referrals) {
-            refIt.madeBy = it.fullname;
-            formattedReferral.push(refIt);
-          }
-        }
-        console.log(formattedReview);
-        this._undoneReviews.next(formattedReview);
-        this._undoneReferrals.next(formattedReferral);
+      map(apptData => {
+        // const formattedReview = [];
+        // const formattedReferral = [];
+        // for (const it of apptData) {
+        //   for (const revIt of it.reviews) {
+        //     revIt.madeBy = it.fullname;
+        //     formattedReview.push(revIt);
+        //   }
+        //   for (const refIt of it.referrals) {
+        //     refIt.madeBy = it.fullname;
+        //     formattedReferral.push(refIt);
+        //   }
+        // }
+
+        // this._undoneReviews.next(formattedReview);
+        // this._undoneReferrals.next(formattedReferral);
+        this._undoneReviews.next(apptData?.data.reviews);
+        this._undoneReferrals.next(apptData?.data.referrals);
       })
     );
   }
@@ -116,19 +145,19 @@ export class AppointmentService {
   getMyCreatedAppointments(appointmentType: string, dateFrom: Date, dateTo: any) {
     let params;
     if (dateTo !== null) {
-     params = new HttpParams()
-      .set('userId', this.authService.getUserId())
-      .set('appointmentType', appointmentType)
-      .set('token', this.authService.getToken())
-      .set('dateFrom', dateFrom.toString())
-      .set('dateTo', dateTo.toString());
+      params = new HttpParams()
+        .set('userId', this.authService.getUserId())
+        .set('appointmentType', appointmentType)
+        .set('token', this.authService.getToken())
+        .set('dateFrom', dateFrom.toString())
+        .set('dateTo', dateTo.toString());
     } else {
       params = new HttpParams()
-      .set('userId', this.authService.getUserId())
-      .set('appointmentType', appointmentType)
-      .set('token', this.authService.getToken())
-      .set('dateFrom', dateFrom.toString())
-      .set('dateTo', 'null');
+        .set('userId', this.authService.getUserId())
+        .set('appointmentType', appointmentType)
+        .set('token', this.authService.getToken())
+        .set('dateFrom', dateFrom.toString())
+        .set('dateTo', 'null');
     }
 
     return this.http
@@ -258,22 +287,21 @@ export class AppointmentService {
     editor?: string,
     madeBy?: string
   ) {
-
+    
     let updatedAppointment: any[];
     if (appointmentScope === AppointmentTypes.general) {
-      let aptObs: Observable<AllReviewsResponseData[]>;
+      let aptObs: Observable<IAppointmentData[]>;
       if (appointmentType === AppointmentTypes.review) {
         aptObs = this.undoneReviews;
       } else if (appointmentType === AppointmentTypes.referral) {
         aptObs = this.undoneReferrals;
       }
+
       return aptObs.pipe(
         take(1),
         switchMap(appointment => {
           this.authService.username.pipe(take(1)).subscribe(usn => { });
-          const updatedAppointmentIndex = appointment.findIndex(
-            ap => ap._id === appointmentId
-          );
+          const updatedAppointmentIndex = appointment.findIndex(ap => ap._id === appointmentId);
           updatedAppointment = [...appointment];
           updatedAppointment[updatedAppointmentIndex] = new Appointment(
             appointmentId,
@@ -295,7 +323,7 @@ export class AppointmentService {
           } else {
             this._undoneReferrals.next(updatedAppointment);
           }
-
+          
           const params = new HttpParams()
             .set(
               'data',
@@ -344,7 +372,7 @@ export class AppointmentService {
             '',
             reason
           );
-console.log(updatedAppointment);
+
           if (appointmentType === AppointmentTypes.review) {
             this._myCreatedReviews.next(updatedAppointment);
           } else {

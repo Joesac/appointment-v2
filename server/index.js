@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express()
 var path = require('path');
+var async = require('async');
 
 app.use(express.urlencoded({extended: false}))
 
@@ -13,7 +14,7 @@ const mongoClient = require('mongodb').MongoClient;
 const url = `mongodb://${config.dbHost}:${config.port}`;
 const secreteKey = 'secreteKey';
 
-app.use(express.static(path.join(__dirname, '../app')))
+// app.use(express.static(path.join(__dirname, '../app')))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -168,12 +169,19 @@ app.get('/api/getallusers', verifyToken, (req, res) => {
     const db = client.db(config.dbName);
     const collection = db.collection(config.dbCollectionUsers);
     
-    collection.find({}).sort({'fullname': 1})
+    collection.find().sort({'fullname': 1})
     .toArray()
-    .then(results => res.json(results))
-    .catch(error => res.send(error));
+    .then(results => {
+      console.log('results => ', results);
+      res.json(results);
+      client.close();
+    })
+    .catch(error => {
+      console.log(error);
+      res.send(error);
+      client.close();
+    });
 
-    client.close();
   })
 })
 
@@ -466,36 +474,40 @@ app.get('/api/MyCreatedAppointments', verifyToken, (req, res) => {
   let dateTo = req.query.dateTo;
 
   if (dateTo == 'null') {
-    dateTo = dateFrom;
+    // dateTo = dateFrom;
+    dateTo = new Date(dateFrom);
+    dateTo = new Date(dateTo.setDate(dateTo.getDate() - 1));
     dateCriteriaField = "$bookedDate";
   } else {
     dateCriteriaField = "$addedOn";
   }
   
-  let dfM = (new Date(dateFrom).getMonth() + 1).toString();
-  let dtM = (new Date(dateTo).getMonth() + 1).toString();
-  let dfD = (new Date(dateFrom).getDate());
-  let dtD = (new Date(dateTo).getDate() + 1);
+  // let dfM = (new Date(dateFrom).getMonth() + 1).toString();
+  // let dtM = (new Date(dateTo).getMonth() + 1).toString();
+  // let dfD = (new Date(dateFrom).getDate());
+  // let dtD = (new Date(dateTo).getDate() + 1);
 
 
-  if (dfM.toString().length == 1) {
-    dfM = `0${dfM}`;
-  }
-  if (dtM.toString().length == 1) {
-    dtM = `0${dtM}`;
-  };
+  // if (dfM.toString().length == 1) {
+  //   dfM = `0${dfM}`;
+  // }
+  // if (dtM.toString().length == 1) {
+  //   dtM = `0${dtM}`;
+  // };
 
-  if (dfD.toString().length == 1) {
-    dfD = `0${dfD}`;
-  }
-  if (dtD.toString().length == 1) {
-    dtD = `0${dtD}`;
-  };
+  // if (dfD.toString().length == 1) {
+  //   dfD = `0${dfD}`;
+  // }
+  // if (dtD.toString().length == 1) {
+  //   dtD = `0${dtD}`;
+  // };
   
 
-  let df = (`${new Date(dateFrom).getFullYear()}-${dfM}-${dfD}`);
-  let dt = (`${new Date(dateTo).getFullYear()}-${dtM}-${dtD}`);
+  // let df = (`${new Date(dateFrom).getFullYear()}-${dfM}-${dfD}`);
+  // let dt = (`${new Date(dateTo).getFullYear()}-${dtM}-${dtD}`);
   
+ 
+
   mongoClient.connect(url, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -514,6 +526,15 @@ app.get('/api/MyCreatedAppointments', verifyToken, (req, res) => {
       return;
     }
     
+    let df = new Date(dateFrom);
+    
+    let dt = new Date(dateTo);
+    dt = new Date(dt.setDate(dt.getDate() + 1));
+
+    console.log('DT: => ', dt);
+  
+    console.log('date from: ', new Date(df), 'date To: ', new Date(df));
+
     collection.aggregate([
       {
         $match: { "_id": ObjectId(id) },
@@ -529,7 +550,9 @@ app.get('/api/MyCreatedAppointments', verifyToken, (req, res) => {
             pipeline: [
               { 
                 // $match: { $expr: {  $and: [ { $eq: [ "$madeBy", "$$id" ] }, { $gte: [ dateCriteriaField, "$$dateFrom" ] }, { $lte: [ dateCriteriaField, "$$dateTo"] } ] } }
-                $match: { $expr: { $and: [ { $eq: [ "$madeBy", "$$id" ] }, { $eq: [ "$done", "0" ] }, { $gte: [ dateCriteriaField, new Date(df) ] }, { $lt: [ dateCriteriaField, new Date(dt) ] } ] } } 
+                $match: { $expr: { $and: [ { $eq: [ "$madeBy", "$$id" ] }, { $eq: [ "$done", "0" ] }, { $gte: [ dateCriteriaField, "$$dateFrom"] }, { $lte: [ dateCriteriaField, "$$dateTo"] }  ] } } 
+                                           
+                                          // { $eq: [ "$madeBy", "$$id" ] }, { $eq: [ "$done", "0" ] }, { $gte: [ dateCriteriaField, new Date(df) ] }, { $lt: [ dateCriteriaField, new Date(dt) ] }
               }
             ],
             as: `myAppointments`
@@ -580,10 +603,12 @@ app.post('/api/updatemyappointment', verifyToken, (req, res) => {
   const data = JSON.parse(req.body.data);
   const appointmentType = req.body.appointmentType;
   const id = data._id;
-
+  
   let bookedDate = null;
   if (data.bookedDate !== null) {
-    bookedDate = new Date(data.bookedDate)
+    // bookedDate = new Date(data.bookedDate)
+    bookedDate = normalizeTimestamp(data.bookedDate);
+    console.log(normalizeTimestamp(data.bookedDate));
   }
   
   let appointment = {
@@ -601,6 +626,7 @@ app.post('/api/updatemyappointment', verifyToken, (req, res) => {
   if (data.reason != undefined) {
     appointment.reason = data.reason
   }
+  console.log(appointment);
   
   mongoClient.connect(url, {
     useUnifiedTopology: true,
@@ -637,13 +663,14 @@ app.get('/api/undone-appointments', verifyToken, (req, res) => {
   if (dateTo == 'null') {
     dateTo = new Date(dateFrom);
     dateTo = new Date(dateTo.setDate(dateTo.getDate() - 1));
-
+    
     // dateTo = dateFrom;
     dateCriteriaField = "$bookedDate";
   } else {
     dateCriteriaField = "$addedOn";
   }
-
+  // dateFrom = new Date('2021/11/04');
+  // dateTo = new Date('2022/01/04')
   mongoClient.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true
@@ -656,54 +683,111 @@ app.get('/api/undone-appointments', verifyToken, (req, res) => {
     let dt = new Date(dateTo);
     dt = new Date(dt.setDate(dt.getDate() + 1));
     
-    collection.aggregate([
-      {
-        $project: {"_id": { $toString: "$_id"}, "fullname": 1}
-      },
-      {
-        $lookup:
+    console.log('date from: ', df, ' date To: ', dt);
+
+    async.waterfall([
+      function GET_REVIEWS(callback) {
+        db.collection(config.dbCollectionReviews).aggregate([
           {
-            from: config.dbCollectionReviews,
-            let: { id: { $toString: "$_id" }, dateFrom: df, dateTo: dt },
-            pipeline: [
-              { $match: 
-                { $expr: 
-                  { 
-                    $and: 
-                    [ 
-                      { $eq: [ "$madeBy", "$$id" ] }, { $eq: [ "$done", "0" ] }, { $gte: [ dateCriteriaField, "$$dateFrom"] }, { $lte: [ dateCriteriaField, "$$dateTo"] } 
-                    ] 
-                  } 
-                } 
-              }
-            ],
-            as: "reviews"
-          }
-      },
-      {
-        $lookup:
+            $addFields: {
+              convertedId: { $toObjectId: "$madeBy" },
+              dateCriteriaField: dateCriteriaField
+            },
+          },
+          { $match: { $and: [ { dateCriteriaField: { $gte: df } }, { dateCriteriaField: { $lte: dt } }, { done: "0" } ] } },
           {
-            from: config.dbCollectionReferrals,
-            let: { id: { $toString: "$_id" }, dateFrom: df, dateTo: dt },
-            pipeline: [
-              { 
-                $match: { 
-                  $expr: { 
-                    $and: [
-                      { $eq: [ "$madeBy", "$$id" ] }, { $eq: [ "$done", "0" ] }, { $gte: [ dateCriteriaField, "$$dateFrom"] }, { $lte: [ dateCriteriaField, "$$dateTo"] } 
-                    ] 
-                  } 
-                } 
-              }
-            ],
-            
-            as: "referrals"
-          }
+            $lookup: {
+              from: config.dbCollectionUsers,
+              localField: "convertedId",
+              foreignField: '_id',
+              as: 'creator'
+            }
+          },
+          { $unwind: { path: "$creator"} }
+        ])
+        .toArray()
+        .then(results => {
+          callback(null, results);
+        })
+        .catch(err => callback(err))
+      },
+      function GET_REFERRALS(ret, callback) {
+        
+        db.collection(config.dbCollectionReferrals).aggregate([
+          {
+            $addFields: {
+              convertedId: { $toObjectId: "$madeBy" }
+            },
+          },
+          { $match: { $and: [ { addedOn: { $gte: df } }, { addedOn: { $lte: dt } }, { done: "0" } ] } },
+          {
+            $lookup: {
+              from: config.dbCollectionUsers,
+              localField: "convertedId",
+              foreignField: '_id',
+              as: 'creator'
+            }
+          },
+          { $unwind: { path: "$creator"} }
+        ])
+        .toArray()
+        .then(results => {
+          callback({ reviews: ret, referrals: results });
+        })
+        .catch(err => callback(err))
       }
-    ])
-    .toArray()
-    .then(results => res.json(results))
-    .catch(error => res.send(error));
+    ], (docs) => {
+      res.json({data: docs})
+    })
+
+    // collection.aggregate([
+    //   {
+    //     $project: {"_id": { $toString: "$_id"}, "fullname": 1}
+    //   },
+    //   {
+    //     $lookup:
+    //       {
+    //         from: config.dbCollectionReviews,
+    //         let: { id: { $toString: "$_id" }, dateFrom: df, dateTo: dt },
+    //         pipeline: [
+    //           { $match: 
+    //             { $expr: 
+    //               { 
+    //                 $and: 
+    //                 [ 
+    //                   { $eq: [ "$madeBy", "$$id" ] }, { $eq: [ "$done", "0" ] }, { $gte: [ dateCriteriaField, "$$dateFrom"] }, { $lte: [ dateCriteriaField, "$$dateTo"] } 
+    //                 ] 
+    //               } 
+    //             } 
+    //           }
+    //         ],
+    //         as: "reviews"
+    //       }
+    //   },
+    //   {
+    //     $lookup:
+    //       {
+    //         from: config.dbCollectionReferrals,
+    //         let: { id: { $toString: "$_id" }, dateFrom: df, dateTo: dt },
+    //         pipeline: [
+    //           { 
+    //             $match: { 
+    //               $expr: { 
+    //                 $and: [
+    //                   { $eq: [ "$madeBy", "$$id" ] }, { $eq: [ "$done", "0" ] }, { $gte: [ dateCriteriaField, "$$dateFrom"] }, { $lte: [ dateCriteriaField, "$$dateTo"] } 
+    //                 ] 
+    //               } 
+    //             } 
+    //           }
+    //         ],
+            
+    //         as: "referrals"
+    //       }
+    //   }
+    // ])
+    // .toArray()
+    // .then(results => res.json(results))
+    // .catch(error => res.send(error));
   });
 });
 
@@ -757,10 +841,10 @@ app.patch('/api/completereferral', verifyToken, (req, res) => {
   })
 })
 
-app.get('*', (req, res) => {
-  return res.sendFile(path.join(__dirname, '../app/index.html'))
-})
+// app.get('*', (req, res) => {
+//   return res.sendFile(path.join(__dirname, '../app/index.html'))
+// })
 
-app.listen(3200, () => {
-  console.log('Server started on port 3200...');
+app.listen(3000, () => {
+  console.log('Server started on port 3000...');
 })
