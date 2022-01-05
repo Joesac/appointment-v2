@@ -656,7 +656,7 @@ app.post('/api/updatemyappointment', verifyToken, (req, res) => {
   });
 })
 
-app.get('/api/undone-appointments', verifyToken, (req, res) => {
+app.get('/api/undone-appointments', /*verifyToken,*/ (req, res) => {
   let { dateFrom, dateTo } = req.query;
   let dateCriteriaField = '';
 
@@ -669,8 +669,8 @@ app.get('/api/undone-appointments', verifyToken, (req, res) => {
   } else {
     dateCriteriaField = "$addedOn";
   }
-  // dateFrom = new Date('2021/11/04');
-  // dateTo = new Date('2022/01/04')
+  dateFrom = new Date('2021/11/04');
+  dateTo = new Date('2022/01/04')
   mongoClient.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true
@@ -703,7 +703,8 @@ app.get('/api/undone-appointments', verifyToken, (req, res) => {
               as: 'creator'
             }
           },
-          { $unwind: { path: "$creator"} }
+          { $unwind: { path: "$creator"} },
+          { $sort: { "creator.fullname": 1 } }
         ])
         .toArray()
         .then(results => {
@@ -728,7 +729,8 @@ app.get('/api/undone-appointments', verifyToken, (req, res) => {
               as: 'creator'
             }
           },
-          { $unwind: { path: "$creator"} }
+          { $unwind: { path: "$creator"} },
+          { $sort: { "creator.fullname": 1 } }
         ])
         .toArray()
         .then(results => {
