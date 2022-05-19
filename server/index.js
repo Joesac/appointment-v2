@@ -669,8 +669,8 @@ app.get('/api/undone-appointments', /*verifyToken,*/ (req, res) => {
   } else {
     dateCriteriaField = "$addedOn";
   }
-  dateFrom = new Date('2021/11/04');
-  dateTo = new Date('2022/01/04')
+  // dateFrom = new Date('2021/11/04');
+  // dateTo = new Date('2022/01/04')
   mongoClient.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true
